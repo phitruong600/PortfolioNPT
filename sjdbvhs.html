@@ -1,0 +1,1247 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Nguyễn Phi Trường | Modern Interactive Portfolio</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --primary: #0066ff;
+            --primary-light: #3d8bff;
+            --primary-dark: #0052cc;
+            --accent: #00d9ff;
+            --accent-warm: #ff6b6b;
+            --accent-purple: #8b5cf6;
+            --neutral-900: #0f0f23;
+            --neutral-800: #16161a;
+            --neutral-700: #242438;
+            --neutral-600: #313244;
+            --neutral-500: #45475a;
+            --neutral-400: #6c7086;
+            --neutral-300: #9399b2;
+            --neutral-200: #bac2de;
+            --neutral-100: #cdd6f4;
+            --neutral-50: #f5f7fa;
+            --glass-bg: rgba(255, 255, 255, 0.03);
+            --glass-border: rgba(255, 255, 255, 0.08);
+            --shadow-primary: 0 25px 50px -12px rgba(0, 102, 255, 0.25);
+            --shadow-accent: 0 25px 50px -12px rgba(0, 217, 255, 0.25);
+            --shadow-warm: 0 25px 50px -12px rgba(255, 107, 107, 0.25);
+        }
+
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        
+        html { 
+            scroll-behavior: smooth; 
+            overflow-x: hidden;
+        }
+        
+        body { 
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif; 
+            background: linear-gradient(135deg, var(--neutral-900) 0%, var(--neutral-800) 50%, var(--neutral-900) 100%);
+            color: var(--neutral-100); 
+            line-height: 1.6; 
+            font-weight: 400;
+            overflow-x: hidden;
+            min-height: 100vh;
+        }
+
+        /* === MODERN LOADING SCREEN === */
+        .loader-container {
+            position: fixed;
+            inset: 0;
+            background: var(--neutral-900);
+            z-index: 10000;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: opacity 0.8s ease, visibility 0.8s ease;
+        }
+
+        .loader-container.hidden {
+            opacity: 0;
+            visibility: hidden;
+        }
+
+        .loader {
+            text-align: center;
+        }
+
+        .loader-logo {
+            font-size: 3rem;
+            font-weight: 900;
+            background: linear-gradient(135deg, var(--primary), var(--accent));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            margin-bottom: 2rem;
+            animation: pulse 2s ease-in-out infinite;
+        }
+
+        .loader-progress {
+            width: 300px;
+            height: 4px;
+            background: var(--neutral-700);
+            border-radius: 2px;
+            overflow: hidden;
+            margin-bottom: 1rem;
+        }
+
+        .loader-bar {
+            width: 0%;
+            height: 100%;
+            background: linear-gradient(90deg, var(--primary), var(--accent));
+            border-radius: 2px;
+            transition: width 0.3s ease;
+        }
+
+        .loader-text {
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 0.9rem;
+            color: var(--neutral-300);
+            margin-top: 1rem;
+        }
+
+        @keyframes pulse {
+            0%, 100% { opacity: 1; transform: scale(1); }
+            50% { opacity: 0.7; transform: scale(1.05); }
+        }
+
+        /* === MODERN NAVIGATION === */
+        .navbar {
+            position: fixed;
+            top: 2rem;
+            left: 50%;
+            transform: translateX(-50%);
+            z-index: 1000;
+            background: rgba(15, 15, 35, 0.8);
+            backdrop-filter: blur(20px);
+            -webkit-backdrop-filter: blur(20px);
+            border: 1px solid var(--glass-border);
+            border-radius: 50px;
+            padding: 0.5rem;
+            transition: all 0.3s ease;
+        }
+
+        .navbar.scrolled {
+            top: 1rem;
+            background: rgba(15, 15, 35, 0.95);
+        }
+
+        .nav-list {
+            display: flex;
+            list-style: none;
+            gap: 0.5rem;
+            align-items: center;
+        }
+
+        .nav-item a {
+            display: block;
+            padding: 0.75rem 1.5rem;
+            text-decoration: none;
+            color: var(--neutral-300);
+            font-weight: 500;
+            font-size: 0.9rem;
+            border-radius: 25px;
+            transition: all 0.3s ease;
+            position: relative;
+        }
+
+        .nav-item a:hover,
+        .nav-item a.active {
+            color: var(--neutral-50);
+            background: linear-gradient(135deg, var(--primary), var(--primary-light));
+            box-shadow: 0 8px 25px rgba(0, 102, 255, 0.3);
+            transform: translateY(-2px);
+        }
+
+        /* === HERO SECTION === */
+        .hero {
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 6rem 2rem 2rem;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .hero-background {
+            position: absolute;
+            inset: 0;
+            background: 
+                radial-gradient(circle at 20% 20%, rgba(0, 102, 255, 0.1) 0%, transparent 50%),
+                radial-gradient(circle at 80% 80%, rgba(0, 217, 255, 0.1) 0%, transparent 50%),
+                radial-gradient(circle at 40% 60%, rgba(139, 92, 246, 0.1) 0%, transparent 50%);
+        }
+
+        .hero-particles {
+            position: absolute;
+            inset: 0;
+            overflow: hidden;
+        }
+
+        .particle {
+            position: absolute;
+            width: 2px;
+            height: 2px;
+            background: var(--accent);
+            border-radius: 50%;
+            animation: float 6s ease-in-out infinite;
+        }
+
+        @keyframes float {
+            0%, 100% { transform: translateY(0px) rotate(0deg); opacity: 0.4; }
+            50% { transform: translateY(-20px) rotate(180deg); opacity: 1; }
+        }
+
+        .hero-content {
+            max-width: 1200px;
+            width: 100%;
+            margin: 0 auto;
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 4rem;
+            align-items: center;
+            position: relative;
+            z-index: 2;
+        }
+
+        .hero-text {
+            animation: slideInLeft 1s ease-out;
+        }
+
+        .hero-label {
+            display: inline-block;
+            padding: 0.5rem 1rem;
+            background: linear-gradient(135deg, var(--accent), var(--primary));
+            border-radius: 20px;
+            font-size: 0.8rem;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            margin-bottom: 1.5rem;
+            color: var(--neutral-900);
+        }
+
+        .hero-title {
+            font-size: clamp(3rem, 8vw, 5rem);
+            font-weight: 900;
+            line-height: 1.1;
+            margin-bottom: 1.5rem;
+            background: linear-gradient(135deg, var(--neutral-50), var(--neutral-300));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        .hero-subtitle {
+            font-size: clamp(1.2rem, 3vw, 1.5rem);
+            font-weight: 300;
+            color: var(--accent);
+            margin-bottom: 2rem;
+            font-family: 'JetBrains Mono', monospace;
+        }
+
+        .hero-description {
+            font-size: 1.1rem;
+            color: var(--neutral-300);
+            margin-bottom: 3rem;
+            line-height: 1.7;
+            max-width: 500px;
+        }
+
+        .hero-actions {
+            display: flex;
+            gap: 1rem;
+            flex-wrap: wrap;
+        }
+
+        .btn {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            gap: 0.5rem;
+            padding: 1rem 2rem;
+            border: none;
+            border-radius: 50px;
+            text-decoration: none;
+            font-weight: 600;
+            font-size: 1rem;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .btn-primary {
+            background: linear-gradient(135deg, var(--primary), var(--primary-light));
+            color: white;
+            box-shadow: var(--shadow-primary);
+        }
+
+        .btn-primary:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 35px 60px -12px rgba(0, 102, 255, 0.4);
+        }
+
+        .btn-secondary {
+            background: var(--glass-bg);
+            border: 1px solid var(--glass-border);
+            color: var(--neutral-100);
+            backdrop-filter: blur(10px);
+        }
+
+        .btn-secondary:hover {
+            background: rgba(255, 255, 255, 0.1);
+            border-color: var(--accent);
+            transform: translateY(-3px);
+        }
+        
+        .btn svg {
+            width: 20px;
+            height: 20px;
+        }
+
+        .hero-visual {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            position: relative;
+            animation: slideInRight 1s ease-out;
+        }
+
+        .hero-image-container {
+            position: relative;
+            width: 400px;
+            height: 400px;
+            border-radius: 50%;
+            overflow: hidden;
+            border: 3px solid var(--glass-border);
+            background: var(--glass-bg);
+            backdrop-filter: blur(20px);
+            animation: rotate 20s linear infinite, subtleFloat 8s ease-in-out infinite;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .hero-image {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+        
+        .hero-image.logo {
+            width: 80%;
+            height: 80%;
+            object-fit: contain;
+        }
+
+        .orbit {
+            position: absolute;
+            border: 1px solid var(--glass-border);
+            border-radius: 50%;
+            animation: rotate 30s linear infinite reverse;
+        }
+
+        .orbit-1 { width: 450px; height: 450px; }
+        .orbit-2 { width: 500px; height: 500px; }
+
+        .orbit-dot {
+            position: absolute;
+            width: 8px;
+            height: 8px;
+            background: var(--accent);
+            border-radius: 50%;
+            box-shadow: 0 0 20px var(--accent);
+        }
+
+        .orbit-1 .orbit-dot { top: -4px; left: 50%; transform: translateX(-50%); }
+        .orbit-2 .orbit-dot { top: 50%; right: -4px; transform: translateY(-50%); }
+
+        @keyframes rotate {
+            from { transform: rotate(0deg); }
+            to { transform: rotate(360deg); }
+        }
+
+        @keyframes subtleFloat {
+            0%, 100% { transform: translateY(0); }
+            50% { transform: translateY(-10px); }
+        }
+
+        @keyframes slideInLeft {
+            from { opacity: 0; transform: translateX(-50px); }
+            to { opacity: 1; transform: translateX(0); }
+        }
+
+        @keyframes slideInRight {
+            from { opacity: 0; transform: translateX(50px); }
+            to { opacity: 1; transform: translateX(0); }
+        }
+
+        /* === MODERN SECTIONS === */
+        .section {
+            padding: 8rem 2rem;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+
+        .section-header {
+            text-align: center;
+            margin-bottom: 4rem;
+        }
+
+        .section-label {
+            display: inline-block;
+            padding: 0.5rem 1rem;
+            background: rgba(255, 255, 255, 0.05);
+            border: 1px solid var(--glass-border);
+            border-radius: 20px;
+            font-size: 0.9rem;
+            font-weight: 500;
+            margin-bottom: 1rem;
+            color: var(--accent);
+        }
+
+        .section-title {
+            font-size: clamp(2.5rem, 6vw, 3.5rem);
+            font-weight: 800;
+            margin-bottom: 1rem;
+            background: linear-gradient(135deg, var(--neutral-50), var(--neutral-300));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        .section-description {
+            font-size: 1.1rem;
+            color: var(--neutral-300);
+            max-width: 600px;
+            margin: 0 auto;
+        }
+
+        /* === PORTFOLIO GALLERY (NEW) === */
+        .portfolio-grid {
+            display: grid;
+            gap: 1.5rem;
+            grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+            grid-auto-flow: dense;
+        }
+
+        .gallery-item {
+            position: relative;
+            border-radius: 20px;
+            overflow: hidden;
+            background: var(--neutral-800);
+            border: 1px solid var(--glass-border);
+            transition: all 0.4s ease;
+            cursor: pointer;
+        }
+        
+        .gallery-item:hover {
+            transform: translateY(-8px) scale(1.02);
+            box-shadow: var(--shadow-accent);
+            border-color: var(--accent);
+        }
+
+        .gallery-item img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            transition: transform 0.4s ease;
+        }
+
+        .gallery-item:hover img {
+            transform: scale(1.1);
+        }
+
+        .gallery-overlay {
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            padding: 3rem 1.5rem 1.5rem;
+            background: linear-gradient(0deg, rgba(15, 15, 35, 0.9) 0%, rgba(15, 15, 35, 0) 100%);
+            color: var(--neutral-50);
+            transform: translateY(100%);
+            opacity: 0;
+            transition: all 0.5s cubic-bezier(0.23, 1, 0.32, 1);
+        }
+
+        .gallery-item:hover .gallery-overlay {
+            transform: translateY(0);
+            opacity: 1;
+        }
+
+        .gallery-overlay h4 {
+            font-size: 1.25rem;
+            font-weight: 600;
+            margin-bottom: 0.25rem;
+            transform: translateY(20px);
+            opacity: 0;
+            transition: all 0.5s cubic-bezier(0.23, 1, 0.32, 1) 0.1s;
+        }
+
+        .gallery-overlay p {
+            font-size: 0.9rem;
+            color: var(--neutral-300);
+            transform: translateY(20px);
+            opacity: 0;
+            transition: all 0.5s cubic-bezier(0.23, 1, 0.32, 1) 0.2s;
+        }
+
+        .gallery-item:hover .gallery-overlay h4,
+        .gallery-item:hover .gallery-overlay p {
+            transform: translateY(0);
+            opacity: 1;
+        }
+
+        /* Masonry Grid Layout */
+        @media (min-width: 768px) {
+            .portfolio-grid {
+                grid-template-columns: repeat(4, 1fr);
+            }
+             .gallery-item {
+                grid-column: span 1;
+                grid-row: span 1;
+            }
+            .gallery-item.item-1, 
+            .gallery-item.item-7,
+            .gallery-item.item-9,
+            .gallery-item.item-14 {
+                grid-column: span 2;
+            }
+            .gallery-item.item-3,
+            .gallery-item.item-11,
+            .gallery-item.item-18,
+            .gallery-item.item-16 {
+                grid-row: span 2;
+            }
+             .gallery-item.item-5 {
+                grid-column: span 2;
+                grid-row: span 2;
+            }
+        }
+
+        /* === ABOUT SECTION CARD FIX === */
+        .about-card {
+            background: var(--glass-bg);
+            border: 1px solid var(--glass-border);
+            border-radius: 20px;
+            padding: 2rem;
+            transition: all 0.3s ease;
+            height: 100%; /* Ensure cards have same height */
+        }
+        .about-card:hover {
+            transform: translateY(-5px);
+            box-shadow: var(--shadow-accent);
+        }
+        .about-card h3 {
+            font-size: 1.3rem;
+            font-weight: 600;
+            margin-bottom: 0.5rem;
+            color: var(--neutral-50);
+        }
+        .about-card p {
+            color: var(--neutral-300);
+            font-size: 0.95rem;
+        }
+
+        /* === SKILLS SECTION === */
+        .skills-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+            gap: 2rem;
+            margin-top: 3rem;
+        }
+
+        .skill-card {
+            padding: 2.5rem;
+            background: var(--glass-bg);
+            border: 1px solid var(--glass-border);
+            border-radius: 20px;
+            backdrop-filter: blur(10px);
+            transition: all 0.3s ease;
+            text-align: center;
+        }
+
+        .skill-card:hover {
+            transform: translateY(-5px);
+            border-color: var(--accent);
+            box-shadow: var(--shadow-accent);
+        }
+
+        .skill-icon {
+            height: 48px;
+            width: 48px;
+            margin-bottom: 1.5rem;
+            display: inline-block;
+            color: var(--accent);
+        }
+
+        .skill-title {
+            font-size: 1.4rem;
+            font-weight: 600;
+            margin-bottom: 1rem;
+            color: var(--neutral-50);
+        }
+
+        .skill-description {
+            color: var(--neutral-300);
+            line-height: 1.6;
+        }
+
+        /* === CONTACT SECTION === */
+        .contact-form {
+            max-width: 700px;
+            margin: 0 auto;
+            background: var(--glass-bg);
+            border: 1px solid var(--glass-border);
+            border-radius: 20px;
+            padding: 3rem;
+            backdrop-filter: blur(10px);
+        }
+
+        .form-group {
+            margin-bottom: 2rem;
+        }
+
+        .form-label {
+            display: block;
+            margin-bottom: 0.5rem;
+            font-weight: 500;
+            color: var(--neutral-200);
+        }
+
+        .form-input,
+        .form-textarea {
+            width: 100%;
+            padding: 1rem;
+            background: rgba(0, 0, 0, 0.2);
+            border: 1px solid var(--glass-border);
+            border-radius: 10px;
+            color: var(--neutral-100);
+            font-family: inherit;
+            font-size: 1rem;
+            transition: all 0.3s ease;
+        }
+
+        .form-input:focus,
+        .form-textarea:focus {
+            outline: none;
+            border-color: var(--accent);
+            box-shadow: 0 0 0 3px rgba(0, 217, 255, 0.1);
+        }
+
+        .form-textarea {
+            resize: vertical;
+            min-height: 120px;
+        }
+
+        /* === FOOTER === */
+        .footer {
+            padding: 4rem 2rem 2rem;
+            text-align: center;
+            border-top: 1px solid var(--glass-border);
+            margin-top: 4rem;
+        }
+
+        .footer-logo {
+            font-size: 1.5rem;
+            font-weight: 800;
+            margin-bottom: 1rem;
+            background: linear-gradient(135deg, var(--primary), var(--accent));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            display: inline-block;
+        }
+
+        .footer-socials {
+            display: flex;
+            justify-content: center;
+            gap: 1.5rem;
+            margin-bottom: 1.5rem;
+        }
+
+        .footer-socials a {
+            color: var(--neutral-300);
+            font-size: 1.5rem;
+            transition: color 0.3s ease, transform 0.3s ease;
+        }
+        .footer-socials a:hover {
+            color: var(--accent);
+            transform: scale(1.2);
+        }
+
+        .footer-copyright {
+            color: var(--neutral-400);
+            font-size: 0.9rem;
+        }
+        
+        /* === RESPONSIVE === */
+        @media (max-width: 992px) {
+             .hero-content {
+                grid-template-columns: 1fr;
+                text-align: center;
+                gap: 3rem;
+            }
+            .hero-text {
+                order: 2;
+            }
+            .hero-visual {
+                order: 1;
+            }
+            .hero-description {
+                margin-left: auto;
+                margin-right: auto;
+            }
+            .hero-actions {
+                justify-content: center;
+            }
+        }
+
+        @media (max-width: 767px) {
+            .navbar {
+                left: 1rem;
+                right: 1rem;
+                transform: none;
+                width: auto;
+            }
+
+            .nav-list {
+                justify-content: space-around;
+                width: 100%;
+            }
+
+            .nav-item a {
+                padding: 0.5rem 1rem;
+                font-size: 0.8rem;
+            }
+            
+            .hero-image-container {
+                width: 300px;
+                height: 300px;
+            }
+
+            .orbit-1 { width: 350px; height: 350px; }
+            .orbit-2 { width: 400px; height: 400px; }
+
+            .section {
+                padding: 6rem 1rem;
+            }
+        }
+
+        /* === SCROLL ANIMATIONS === */
+        .fade-in {
+            opacity: 0;
+            transform: translateY(30px);
+            transition: opacity 0.6s ease, transform 0.6s ease;
+        }
+
+        .fade-in.visible {
+            opacity: 1;
+            transform: translateY(0);
+        }
+
+        /* === FLOATING ELEMENTS === */
+        .floating-shape {
+            position: absolute;
+            border-radius: 50%;
+            background: linear-gradient(135deg, var(--primary), var(--accent));
+            opacity: 0.05;
+            animation: float 10s ease-in-out infinite;
+            z-index: -1;
+        }
+
+        .shape-1 {
+            width: 100px;
+            height: 100px;
+            top: 10%;
+            left: 10%;
+            animation-delay: 0s;
+        }
+
+        .shape-2 {
+            width: 150px;
+            height: 150px;
+            top: 60%;
+            right: 10%;
+            animation-delay: 2s;
+        }
+
+        .shape-3 {
+            width: 80px;
+            height: 80px;
+            bottom: 20%;
+            left: 20%;
+            animation-delay: 4s;
+        }
+
+    </style>
+</head>
+<body>
+    <!-- Loading Screen -->
+    <div class="loader-container" id="loader">
+        <div class="loader">
+            <div class="loader-logo">NPT</div>
+            <div class="loader-progress">
+                <div class="loader-bar" id="progressBar"></div>
+            </div>
+            <div class="loader-text" id="loadingText">Đang tải tài nguyên...</div>
+        </div>
+    </div>
+
+    <!-- Navigation -->
+    <nav class="navbar" id="navbar">
+        <ul class="nav-list">
+            <li class="nav-item"><a href="#hero" class="nav-link active">Trang chủ</a></li>
+            <li class="nav-item"><a href="#about" class="nav-link">Giới thiệu</a></li>
+            <li class="nav-item"><a href="#portfolio" class="nav-link">Dự án</a></li>
+            <li class="nav-item"><a href="#skills" class="nav-link">Kỹ năng</a></li>
+            <li class="nav-item"><a href="#contact" class="nav-link">Liên hệ</a></li>
+        </ul>
+    </nav>
+
+    <!-- Hero Section -->
+    <section id="hero" class="hero">
+        <div class="hero-background"></div>
+        <div class="hero-particles" id="particles"></div>
+        
+        <div class="floating-shape shape-1"></div>
+        <div class="floating-shape shape-2"></div>
+        <div class="floating-shape shape-3"></div>
+
+        <div class="hero-content">
+            <div class="hero-text">
+                <span class="hero-label">Visual Storyteller</span>
+                <h1 class="hero-title">Nguyễn Phi Trường</h1>
+                <p class="hero-subtitle">Photo Editor &amp; Creative Developer</p>
+                <p class="hero-description">
+                    Kết hợp tinh thần sáng tạo từ nghệ thuật và tư duy logic từ lập trình để tạo ra những câu chuyện hình ảnh độc đáo. 
+                    Chuyên môn trong việc chỉnh sửa ảnh chuyên nghiệp và phát triển workflow tự động hóa.
+                </p>
+                <div class="hero-actions">
+                    <a href="#portfolio" class="btn btn-primary">Khám phá tác phẩm</a>
+                    <a href="#contact" class="btn btn-secondary">Liên hệ hợp tác</a>
+                </div>
+            </div>
+            
+            <div class="hero-visual">
+                <div class="orbit orbit-1">
+                    <div class="orbit-dot"></div>
+                </div>
+                <div class="orbit orbit-2">
+                    <div class="orbit-dot"></div>
+                </div>
+                <div class="hero-image-container">
+                    <img src="logo.png" alt="Nguyễn Phi Trường Logo" class="hero-image logo">
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- About Section -->
+    <section id="about" class="section">
+        <div class="container">
+            <div class="section-header fade-in">
+                <span class="section-label">Câu chuyện của tôi</span>
+                <h2 class="section-title">Hành trình &amp; Tầm nhìn</h2>
+                <p class="section-description">
+                    Từ một developer đến một visual storyteller, tôi mang theo những kinh nghiệm quý báu để tạo ra những tác phẩm có giá trị.
+                </p>
+            </div>
+            
+            <div class="skills-grid">
+                <div class="about-card fade-in" style="transition-delay: 100ms;">
+                    <h3>Background Công nghệ</h3>
+                    <p>
+                        Xuất thân từ Khoa học Máy tính tại Đại học Bách Khoa, tôi có nền tảng vững chắc về kỹ thuật và tư duy logic. 
+                        Điều này giúp tôi tiếp cận photo editing một cách có hệ thống và tối ưu hóa workflow.
+                    </p>
+                </div>
+                
+                <div class="about-card fade-in" style="transition-delay: 200ms;">
+                    <h3>Đam mê Sáng tạo</h3>
+                    <p>
+                        Nhiếp ảnh không chỉ là sở thích mà là ngôn ngữ để tôi truyền tải cảm xúc và câu chuyện. 
+                        Mỗi bức ảnh là một cơ hội để khám phá và thể hiện góc nhìn độc đáo về thế giới.
+                    </p>
+                </div>
+                
+                <div class="about-card fade-in" style="transition-delay: 300ms;">
+                    <h3>Triết lý Làm việc</h3>
+                    <p>
+                        Tôi tin rằng công nghệ và nghệ thuật không đối lập mà bổ sung cho nhau. 
+                        Sự kết hợp này tạo ra những giải pháp sáng tạo vượt trội và hiệu quả cao.
+                    </p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Portfolio Section -->
+    <section id="portfolio" class="section">
+        <div class="container">
+            <div class="section-header fade-in">
+                <span class="section-label">Tác phẩm nổi bật</span>
+                <h2 class="section-title">Portfolio Chuyên nghiệp</h2>
+                <p class="section-description">
+                    Khám phá những câu chuyện hình ảnh được kể qua lăng kính của tôi, 
+                    sắp xếp theo một bố cục đầy cảm hứng.
+                </p>
+            </div>
+            
+            <div class="portfolio-grid fade-in" role="tabpanel">
+                <!-- 1 -->
+                <div class="gallery-item item-1" data-category="landscape">
+                    <img src="HoanhonQue.webp" alt="Hoàng hôn miền quê" loading="eager" fetchpriority="high"/>
+                    <div class="gallery-overlay"><h4>Hoàng hôn miền quê</h4><p>Bầu trời tím đỏ ôm trọn bóng dừa trên sông</p></div>
+                </div>
+                <!-- 2 -->
+                <div class="gallery-item item-2" data-category="event">
+                    <img src="2.9VN.webp" alt="Quốc khánh 2/9" loading="eager"/>
+                    <div class="gallery-overlay"><h4>Quốc khánh 2/9</h4><p>Hàng cờ đỏ sao vàng rực rỡ giữa phố</p></div>
+                </div>
+                <!-- 3 -->
+                <div class="gallery-item item-3" data-category="portrait">
+                    <img src="chandung.webp" alt="Chân dung áo trắng cầu thang" loading="lazy"/>
+                    <div class="gallery-overlay"><h4>Chân dung áo trắng cầu thang</h4><p>Ánh nhìn cuốn hút trong không gian cổ điển</p></div>
+                </div>
+                <!-- 4 -->
+                <div class="gallery-item item-4" data-category="portrait">
+                    <img src="chandung2.webp" alt="Chân dung áo trắng bàn bida" loading="lazy"/>
+                    <div class="gallery-overlay"><h4>Chân dung áo trắng bàn bida</h4><p>Vẻ đẹp trong trẻo và cá tính</p></div>
+                </div>
+                <!-- 5 -->
+                <div class="gallery-item item-5" data-category="portrait">
+                    <img src="chandung3.webp" alt="Chân dung dưới ánh đèn" loading="lazy"/>
+                    <div class="gallery-overlay"><h4>Chân dung dưới ánh đèn</h4><p>Ánh sáng vàng ấm áp tạo chiều sâu</p></div>
+                </div>
+                <!-- 6 -->
+                <div class="gallery-item item-6" data-category="portrait">
+                    <img src="chandung4.webp" alt="Chân dung bên sông đêm" loading="lazy"/>
+                    <div class="gallery-overlay"><h4>Chân dung bên sông đêm</h4><p>Nét mơ màng bên bờ sông Sài Gòn lấp lánh</p></div>
+                </div>
+                <!-- 7 -->
+                <div class="gallery-item item-7" data-category="landscape">
+                    <img src="HCMCnight.webp" alt="Sài Gòn skyline – night view 1" loading="lazy"/>
+                    <div class="gallery-overlay"><h4>Sài Gòn skyline – night view 1</h4><p>Thành phố lung linh, rực sáng bên mặt nước</p></div>
+                </div>
+                <!-- 8 -->
+                <div class="gallery-item item-8" data-category="landscape">
+                    <img src="HCMCnight2.webp" alt="Landmark 81 về đêm" loading="lazy"/>
+                    <div class="gallery-overlay"><h4>Landmark 81 về đêm</h4><p>Ánh sáng phản chiếu trên dòng sông Sài Gòn</p></div>
+                </div>
+                <!-- 9 -->
+                <div class="gallery-item item-9" data-category="landscape">
+                    <img src="HCMCnight3.webp" alt="Sài Gòn skyline – night view 2" loading="lazy"/>
+                    <div class="gallery-overlay"><h4>Sài Gòn skyline – night view 2</h4><p>Bức tranh đêm huyền ảo, ánh đèn trải dài</p></div>
+                </div>
+                <!-- 10 -->
+                <div class="gallery-item item-10" data-category="landscape">
+                    <img src="Hoanghon.webp" alt="Hoàng hôn Bitexco" loading="lazy"/>
+                    <div class="gallery-overlay"><h4>Hoàng hôn Bitexco</h4><p>Tòa tháp ẩn hiện sau tán cây trong nắng chiều cam</p></div>
+                </div>
+                <!-- 11 -->
+                <div class="gallery-item item-11" data-category="event">
+                    <img src="Tocxanhvatao.webp" alt="Nữ hoàng diễu hành" loading="lazy"/>
+                    <div class="gallery-overlay"><h4>Nữ hoàng diễu hành</h4><p>Uy nghi rực rỡ giữa đoàn cổ phục lễ hội</p></div>
+                </div>
+                <!-- 12 -->
+                <div class="gallery-item item-12" data-category="event">
+                    <img src="Tocxanhvatao2.webp" alt="Cặp đôi cổ phục" loading="lazy"/>
+                    <div class="gallery-overlay"><h4>Cặp đôi cổ phục</h4><p>Cặp đôi mặc áo dài ngũ thân dắt tay nhau</p></div>
+                </div>
+                <!-- 13 -->
+                <div class="gallery-item item-13" data-category="event">
+                    <img src="Tocxanhvatao3.webp" alt="Đoàn nam cổ phục" loading="lazy"/>
+                    <div class="gallery-overlay"><h4>Đoàn nam cổ phục</h4><p>Dàn nam áo dài xanh đỏ, bước đều trang nghiêm</p></div>
+                </div>
+                <!-- 14 -->
+                <div class="gallery-item item-14" data-category="event">
+                    <img src="Tocxanhvatao4.webp" alt="Đoàn rước lễ hội" loading="lazy"/>
+                    <div class="gallery-overlay"><h4>Đoàn rước lễ hội</h4><p>Không khí trang trọng của lễ rước “Vinh quy bái tổ”</p></div>
+                </div>
+                <!-- 15 -->
+                <div class="gallery-item item-15" data-category="event">
+                    <img src="Tocxanhvatao5.webp" alt="Múa áo tứ thân" loading="lazy"/>
+                    <div class="gallery-overlay"><h4>Múa áo tứ thân</h4><p>Nét duyên dáng trong điệu múa truyền thống</p></div>
+                </div>
+                <!-- 16 -->
+                <div class="gallery-item item-16" data-category="lifestyle">
+                    <img src="KhoangKhong.webp" alt="Hành lang khách sạn" loading="lazy"/>
+                    <div class="gallery-overlay"><h4>Hành lang khách sạn</h4><p>Góc nhìn kéo dài bất tận với ánh sáng vàng dịu</p></div>
+                </div>
+                <!-- 17 -->
+                <div class="gallery-item item-17" data-category="portrait">
+                    <img src="poster.webp" alt="Poster tình yêu" loading="lazy"/>
+                    <div class="gallery-overlay"><h4>Poster tình yêu</h4><p>Khoảnh khắc ngọt ngào của đôi trẻ dưới hàng cây</p></div>
+                </div>
+                <!-- 18 -->
+                <div class="gallery-item item-18" data-category="landscape">
+                    <img src="Suondoi.webp" alt="Rừng thông và khói" loading="lazy"/>
+                    <div class="gallery-overlay"><h4>Rừng thông và khói</h4><p>Hơi sương bảng lảng trên triền đồi tĩnh lặng</p></div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Skills Section -->
+    <section id="skills" class="section">
+        <div class="container">
+            <div class="section-header fade-in">
+                <span class="section-label">Chuyên môn</span>
+                <h2 class="section-title">Kỹ năng &amp; Công cụ</h2>
+                <p class="section-description">
+                    Kết hợp hoàn hảo giữa kỹ năng kỹ thuật và tầm nhìn sáng tạo để mang đến những giải pháp tối ưu nhất.
+                </p>
+            </div>
+            
+            <div class="skills-grid">
+                <div class="skill-card fade-in">
+                    <svg class="skill-icon" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M9.53 16.122a3 3 0 00-5.78 1.128 2.25 2.25 0 01-2.4 2.245 4.5 4.5 0 008.4-2.245c0-.399-.078-.78-.22-1.128zm0 0a15.998 15.998 0 003.388-1.62m-5.043-.025a15.998 15.998 0 011.622-3.385m5.043.025a15.998 15.998 0 001.622-3.385m3.388 1.62a15.998 15.998 0 00-1.622-3.385m-5.043.025a15.998 15.998 0 01-3.388-1.621m7.543 5.042a3 3 0 00-5.78 1.128 2.25 2.25 0 01-2.4 2.245 4.5 4.5 0 008.4-2.245c0-.399-.078-.78-.22-1.128zm0 0a15.998 15.998 0 003.388-1.62m-5.043-.025a15.998 15.998 0 011.622-3.385" /></svg>
+                    <h3 class="skill-title">Photo Editing Mastery</h3>
+                    <p class="skill-description">Kỹ thuật nâng cao với Adobe Lightroom và Photoshop. Chuyên sâu về lý thuyết màu sắc, bố cục và retouching.</p>
+                </div>
+                <div class="skill-card fade-in" style="transition-delay: 100ms;"><svg class="skill-icon" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M21 12a9 9 0 11-18 0 9 9 0 0118 0z" /><path stroke-linecap="round" stroke-linejoin="round" d="M15.91 11.672a.375.375 0 010 .656l-5.603 3.113a.375.375 0 01-.557-.328V8.887c0-.286.307-.466.557-.327l5.603 3.112z" /></svg>
+                    <h3 class="skill-title">Video Production</h3>
+                    <p class="skill-description">Sử dụng CapCut Pro và Adobe Premiere Pro cho video editing, color grading, motion graphics và sound design.</p>
+                </div>
+                <div class="skill-card fade-in" style="transition-delay: 200ms;"><svg class="skill-icon" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M3.75 13.5l10.5-11.25L12 10.5h8.25L9.75 21.75 12 13.5H3.75z" /></svg>
+                    <h3 class="skill-title">Workflow Automation</h3>
+                    <p class="skill-description">Tận dụng background IT để tự động hóa các tác vụ lặp lại, tối ưu hóa thời gian và đảm bảo chất lượng nhất quán.</p>
+                </div>
+                <div class="skill-card fade-in"><svg class="skill-icon" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M10.5 1.5H8.25A2.25 2.25 0 006 3.75v16.5a2.25 2.25 0 002.25 2.25h7.5A2.25 2.25 0 0018 20.25V3.75a2.25 2.25 0 00-2.25-2.25H13.5m-3 0V3h3V1.5m-3 0h3m-3 18.75h3" /></svg>
+                    <h3 class="skill-title">Digital Marketing</h3>
+                    <p class="skill-description">Hiểu rõ yêu cầu của từng nền tảng (Instagram, TikTok, LinkedIn). Tối ưu nội dung để tăng engagement và conversion rate.</p>
+                </div>
+                <div class="skill-card fade-in" style="transition-delay: 100ms;"><svg class="skill-icon" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M9 12.75L11.25 15 15 9.75M21 12a9 9 0 11-18 0 9 9 0 0118 0z" /></svg>
+                    <h3 class="skill-title">Brand Consistency</h3>
+                    <p class="skill-description">Duy trì tính nhất quán trong phong cách và thông điệp của thương hiệu. Xây dựng nhận diện hình ảnh mạnh mẽ và đáng nhớ.</p>
+                </div>
+                <div class="skill-card fade-in" style="transition-delay: 200ms;"><svg class="skill-icon" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M12 20.25c.966 0 1.891-.39 2.573-1.045a4.504 4.504 0 001.03-3.655 4.504 4.504 0 00-1.03-3.655A4.505 4.505 0 0012 11.25c-.966 0-1.891.39-2.573 1.045a4.504 4.504 0 00-1.03-3.655 4.504 4.504 0 001.03-3.655A4.505 4.505 0 0012 3.75z" /></svg>
+                    <h3 class="skill-title">Client Communication</h3>
+                    <p class="skill-description">Kỹ năng giao tiếp tốt, hiểu rõ tầm nhìn của khách hàng. Quản lý dự án hiệu quả từ brief đến khi bàn giao.</p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Contact Section -->
+    <section id="contact" class="section">
+        <div class="container">
+            <div class="section-header fade-in">
+                <span class="section-label">Kết nối</span>
+                <h2 class="section-title">Sẵn sàng hợp tác</h2>
+                <p class="section-description">
+                    Có một dự án thú vị? Hãy cùng thảo luận và biến ý tưởng thành hiện thực!
+                </p>
+            </div>
+            
+            <div class="contact-form fade-in">
+                <form id="contactForm">
+                    <div class="form-group">
+                        <label for="name" class="form-label">Tên của bạn</label>
+                        <input type="text" id="name" class="form-input" placeholder="Nhập tên đầy đủ" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="email" class="form-label">Email</label>
+                        <input type="email" id="email" class="form-input" placeholder="your@email.com" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="project" class="form-label">Loại dự án</label>
+                        <select id="project" class="form-input" required>
+                            <option value="">Chọn loại dự án</option>
+                            <option value="portrait">Portrait Photography</option>
+                            <option value="event">Event Coverage</option>
+                            <option value="commercial">Commercial Project</option>
+                            <option value="social">Social Media Content</option>
+                            <option value="other">Khác</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label for="message" class="form-label">Mô tả dự án</label>
+                        <textarea id="message" class="form-textarea" placeholder="Chia sẻ chi tiết về dự án của bạn..." required></textarea>
+                    </div>
+                    <button type="submit" class="btn btn-primary" style="width: 100%;">Gửi yêu cầu hợp tác</button>
+                </form>
+                <div style="margin-top: 3rem; text-align: center; padding-top: 2rem; border-top: 1px solid var(--glass-border);">
+                    <p style="color: var(--neutral-300); margin-bottom: 1rem;">Hoặc liên hệ trực tiếp:</p>
+                    <div style="display: flex; justify-content: center; gap: 1rem; flex-wrap: wrap;">
+                        <a href="mailto:nguyenphitruong1807@gmail.com" class="btn btn-secondary"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor"><path d="M1.5 8.67v8.58a3 3 0 0 0 3 3h15a3 3 0 0 0 3-3V8.67l-8.928 5.493a3 3 0 0 1-3.144 0L1.5 8.67Z"/><path d="M22.5 6.908V6.75a3 3 0 0 0-3-3h-15a3 3 0 0 0-3 3v.158l9.714 5.978a1.5 1.5 0 0 0 1.572 0L22.5 6.908Z"/></svg> Email</a>
+                        <a href="tel:0782800789" class="btn btn-secondary"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor"><path d="M16.57 22a2 2 0 0 0 1.43-.59l2.71-2.71a1 1 0 0 0 0-1.41l-4-4a1 1 0 0 0-1.41 0l-1.6 1.59a1 1 0 0 1-1.41 0l-4.29-4.3a1 1 0 0 1 0-1.41l1.59-1.6a1 1 0 0 0 0-1.41l-4-4a1 1 0 0 0-1.41 0L2.59 4A2 2 0 0 0 2 5.43 16.57 16.57 0 0 0 18.57 22Z"/></svg> Điện thoại</a>
+                        <a href="https://linkedin.com/in/nguyenphitruong" class="btn btn-secondary" target="_blank" rel="noopener noreferrer"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor"><path d="M20.447 20.452h-3.554v-5.569c0-1.328-.027-3.037-1.852-3.037-1.853 0-2.136 1.445-2.136 2.939v5.667H9.351V9h3.414v1.561h.046c.477-.9 1.637-1.85 3.37-1.85 3.601 0 4.267 2.37 4.267 5.455v6.286zM5.337 7.433a2.062 2.062 0 0 1-2.063-2.065 2.064 2.064 0 1 1 2.063 2.065zm1.782 13.019H3.555V9h3.564v11.452zM22.225 0H1.771C.792 0 0 .774 0 1.729v20.542C0 23.227.792 24 1.771 24h20.451C23.2 24 24 23.227 24 22.271V1.729C24 .774 23.2 0 22.225 0z"/></svg> LinkedIn</a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+    
+    <!-- Footer -->
+    <footer class="footer">
+         <div class="container">
+             <div class="footer-logo">NPT</div>
+             <div class="footer-socials">
+                 <a href="https://instagram.com/nguyenphitruong" target="_blank" rel="noopener noreferrer" aria-label="Instagram"><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="2" width="20" height="20" rx="5" ry="5"></rect><path d="M16 11.37A4 4 0 1 1 12.63 8 4 4 0 0 1 16 11.37z"></path><line x1="17.5" y1="6.5" x2="17.51" y2="6.5"></line></svg></a>
+                 <a href="https://facebook.com/nguyenphitruong" target="_blank" rel="noopener noreferrer" aria-label="Facebook"><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M18 2h-3a5 5 0 0 0-5 5v3H7v4h3v8h4v-8h3l1-4h-4V7a1 1 0 0 1 1-1h3z"></path></svg></a>
+                 <a href="https://linkedin.com/in/nguyenphitruong" target="_blank" rel="noopener noreferrer" aria-label="LinkedIn"><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M16 8a6 6 0 0 1 6 6v7h-4v-7a2 2 0 0 0-2-2 2 2 0 0 0-2 2v7h-4v-7a6 6 0 0 1 6-6z"></path><rect x="2" y="9" width="4" height="12"></rect><circle cx="4" cy="4" r="2"></circle></svg></a>
+             </div>
+             <p class="footer-copyright">&copy; 2024 Nguyễn Phi Trường. All Rights Reserved.</p>
+         </div>
+    </footer>
+
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            // Loading Animation
+            const loader = document.getElementById('loader');
+            const progressBar = document.getElementById('progressBar');
+            const loadingText = document.getElementById('loadingText');
+            
+            if (loader) {
+                const steps = ['Khởi tạo giao diện...','Tải tài nguyên hình ảnh...','Chuẩn bị animations...','Hoàn tất!'];
+                let progress = 0;
+                let stepIndex = 0;
+                const loadingInterval = setInterval(() => {
+                    progress += Math.random() * 15 + 5;
+                    if (progress > 100) progress = 100;
+                    if(progressBar) progressBar.style.width = progress + '%';
+                    if (stepIndex < steps.length - 1 && progress > (stepIndex + 1) * 25) {
+                        stepIndex++;
+                        if(loadingText) loadingText.textContent = steps[stepIndex];
+                    }
+                    if (progress >= 100) {
+                        clearInterval(loadingInterval);
+                        setTimeout(() => {
+                            loader.classList.add('hidden');
+                            document.body.style.overflow = ''; // Restore scroll
+                            initAnimations();
+                        }, 800);
+                    }
+                }, 100);
+            } else {
+                 initAnimations();
+            }
+
+            // Navigation scroll effect
+            const navbar = document.getElementById('navbar');
+            window.addEventListener('scroll', function() {
+                if (window.scrollY > 50) {
+                    navbar.classList.add('scrolled');
+                } else {
+                    navbar.classList.remove('scrolled');
+                }
+            });
+
+            // Smooth scrolling and active link update
+            const navLinks = document.querySelectorAll('.nav-link');
+            navLinks.forEach(link => {
+                link.addEventListener('click', function(e) {
+                    e.preventDefault();
+                    const targetId = this.getAttribute('href');
+                    const targetElement = document.querySelector(targetId);
+                    if (targetElement) {
+                         targetElement.scrollIntoView({ behavior: 'smooth', block: 'start' });
+                    }
+                });
+            });
+
+            // Floating particles animation
+            function createParticles() {
+                const particlesContainer = document.getElementById('particles');
+                if (!particlesContainer) return;
+                const particleCount = 50;
+                for (let i = 0; i < particleCount; i++) {
+                    const particle = document.createElement('div');
+                    particle.className = 'particle';
+                    particle.style.left = Math.random() * 100 + '%';
+                    particle.style.top = Math.random() * 100 + '%';
+                    particle.style.animationDelay = Math.random() * 6 + 's';
+                    particle.style.animationDuration = (Math.random() * 3 + 3) + 's';
+                    particlesContainer.appendChild(particle);
+                }
+            }
+
+            // Scroll-triggered animations
+            function initScrollAnimations() {
+                const observerOptions = {
+                    threshold: 0.1,
+                    rootMargin: '0px 0px -50px 0px'
+                };
+                const observer = new IntersectionObserver((entries, observer) => {
+                    entries.forEach(entry => {
+                        if (entry.isIntersecting) {
+                            entry.target.classList.add('visible');
+                            observer.unobserve(entry.target);
+                        }
+                    });
+                }, observerOptions);
+                document.querySelectorAll('.fade-in').forEach(el => observer.observe(el));
+            }
+
+            // Form submission
+            const contactForm = document.getElementById('contactForm');
+            if (contactForm) {
+                contactForm.addEventListener('submit', function(e) {
+                    e.preventDefault();
+                    const name = document.getElementById('name').value;
+                    console.log('Form submitted:', { name: name, email: document.getElementById('email').value, project: document.getElementById('project').value, message: document.getElementById('message').value });
+                    const submitButton = this.querySelector('button[type="submit"]');
+                    const originalText = submitButton.innerHTML;
+                    submitButton.innerHTML = `Đã gửi! Cảm ơn bạn.`;
+                    submitButton.disabled = true;
+                    setTimeout(() => {
+                        this.reset();
+                        submitButton.innerHTML = originalText;
+                        submitButton.disabled = false;
+                    }, 3000);
+                });
+            }
+
+            // Navigation active state based on scroll position
+            const sections = document.querySelectorAll('section[id]');
+            window.addEventListener('scroll', function() {
+                let currentSection = '';
+                sections.forEach(section => {
+                    const sectionTop = section.offsetTop - 150;
+                    if (window.scrollY >= sectionTop) {
+                        currentSection = section.getAttribute('id');
+                    }
+                });
+                navLinks.forEach(link => {
+                    link.classList.remove('active');
+                    if (link.getAttribute('href') === '#' + currentSection) {
+                        link.classList.add('active');
+                    }
+                });
+            });
+
+            // Initialize all animations
+            function initAnimations() {
+                createParticles();
+                initScrollAnimations();
+                const shapes = document.querySelectorAll('.floating-shape');
+                window.addEventListener('scroll', function() {
+                    const scrolled = window.pageYOffset;
+                    shapes.forEach((shape, index) => {
+                        const speed = 0.1 + (index * 0.05);
+                        shape.style.transform = `translateY(${scrolled * speed}px)`;
+                    });
+                });
+            }
+        });
+    </script>
+</body>
+</html>
+
+
